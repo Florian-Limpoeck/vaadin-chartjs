@@ -56,49 +56,62 @@ window.com_byteowls_vaadin_chartjs_ChartJs = function() {
             }
 
             // only enable if there is a listener
-            if (state.dataPointClickListenerFound) {
-                if (loggingEnabled) {
-                    console.log("chartjs: add data point click callback");
-                }
-                canvas.onclick = function(e) {
-                    var elementArr = chartjs.getElementAtEvent(e);
-                    if (elementArr && elementArr.length > 0) {
-                        if (loggingEnabled) {
-                            console.log("chartjs: onclick elements at:");
-                            console.log(elementArr[0]);
-                        }
-                        // call on function registered by server side component
-                        self.onDataPointClick(elementArr[0]._datasetIndex, elementArr[0]._index);
-                    }
-                };
-            }
-            if (state.legendClickListenerFound) {
-                if (loggingEnabled) {
-                    console.log("chartjs: add legend click callback");
-                }
-                chartjs.legend.options.onClick = chartjs.options.legend.onClick = function (t,e) {
-                    var datasets = this.chart.data.datasets;
-                    var dataset = datasets[e.datasetIndex];
-                    dataset.hidden= !dataset.hidden;
-                    this.chart.update();
-                    var ret = [];
-                    for (var i = 0; i < datasets.length ; i++ ) {
-                        if (!datasets[i].hidden) {
-                            ret.push(i);
-                        }
-                    }
-                    self.onLegendClick(e.datasetIndex,!dataset.hidden, ret);
-                }
-            }
+            this.updateDataPointClickCallback(state);
+            this.updateLegendClickCallback(state);
         } else {
             // update the data
-            chartjs.config.data = this.getState().configurationJson.data;
+            chartjs.resize();
+            chartjs.config.data = state.configurationJson.data;
             // update config: options must be copied separately, just copying the "options" object does not work
-            chartjs.config.options.legend = this.getState().configurationJson.options.legend;
-            chartjs.config.options.annotation = this.getState().configurationJson.options.annotation;
+            chartjs.config.options.legend = state.configurationJson.options.legend;
+            chartjs.config.options.scales = state.configurationJson.options.scales;
+            chartjs.config.options.annotation = state.configurationJson.options.annotation;
+            //also update click listeners, otherwise a change of the state on the server might lead to missing listeners
+            this.updateDataPointClickCallback(state);
+            this.updateLegendClickCallback(state);
             chartjs.update();
         }
 
+    };
+
+    this.updateLegendClickCallback = function (state) {
+        if (state.legendClickListenerFound) {
+            if (loggingEnabled) {
+                console.log("chartjs: add legend click callback");
+            }
+            chartjs.legend.options.onClick = chartjs.options.legend.onClick = function (t, e) {
+                var datasets = this.chart.data.datasets;
+                var dataset = datasets[e.datasetIndex];
+                dataset.hidden = !dataset.hidden;
+                this.chart.update();
+                var ret = [];
+                for (var i = 0; i < datasets.length; i++) {
+                    if (!datasets[i].hidden) {
+                        ret.push(i);
+                    }
+                }
+                self.onLegendClick(e.datasetIndex, !dataset.hidden, ret);
+            }
+        }
+    };
+
+    this.updateDataPointClickCallback = function (state) {
+        if (state.dataPointClickListenerFound) {
+            if (loggingEnabled) {
+                console.log("chartjs: add data point click callback");
+            }
+            canvas.onclick = function(e) {
+                var elementArr = chartjs.getElementAtEvent(e);
+                if (elementArr && elementArr.length > 0) {
+                    if (loggingEnabled) {
+                        console.log("chartjs: onclick elements at:");
+                        console.log(elementArr[0]);
+                    }
+                    // call on function registered by server side component
+                    self.onDataPointClick(elementArr[0]._datasetIndex, elementArr[0]._index);
+                }
+            };
+        }
     };
 
     this.getImageDataUrl = function(type, quality) {
