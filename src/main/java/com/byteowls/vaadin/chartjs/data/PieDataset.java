@@ -36,6 +36,7 @@ public class PieDataset extends DoubleDataset<PieDataset> {
     private List<String> hoverBorderColor;
     private List<Integer> hoverBorderWidth;
     private boolean randomBackgroundColors;
+    private List<Integer> hiddenSlices;
 
     /**
      * Used if the type of a dataset is needed. e.g. combo chart type charts
@@ -74,6 +75,14 @@ public class PieDataset extends DoubleDataset<PieDataset> {
      */
     public PieDataset hidden(boolean hidden) {
         this.hidden = hidden;
+        return this;
+    }
+
+    /**
+     * The indices of all hidden pie chart slices.
+     */
+    public PieDataset hiddenSlices(Integer... hiddenSlices) {
+        this.hiddenSlices = Arrays.asList(hiddenSlices);
         return this;
     }
 
@@ -148,6 +157,7 @@ public class PieDataset extends DoubleDataset<PieDataset> {
             }
             backgroundColor = bgColors;
         }
+        JUtils.putNotNullIntList(map, "hiddenSlices", hiddenSlices);
         JUtils.putNotNullStringListOrSingle(map, "backgroundColor", backgroundColor);
         JUtils.putNotNullStringListOrSingle(map, "borderColor", borderColor);
         JUtils.putNotNullIntListOrSingle(map, "borderWidth", borderWidth);

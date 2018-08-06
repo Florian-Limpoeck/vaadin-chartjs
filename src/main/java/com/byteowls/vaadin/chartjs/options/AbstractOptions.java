@@ -30,6 +30,8 @@ public abstract class AbstractOptions<T> implements JsonBuilder, Serializable {
     private Element<T> elements;
     private Pan<T> pan;
     private Zoom<T> zoom;
+    protected Boolean spanGaps;
+    protected Boolean numberFormatEnabled;
 
     public AbstractOptions(ChartConfig chartConfig) {
         this.chartConfig = chartConfig;
@@ -40,6 +42,22 @@ public abstract class AbstractOptions<T> implements JsonBuilder, Serializable {
      */
     public T responsive(boolean responsive) {
         this.responsive = responsive;
+        return getThis();
+    }
+
+    /**
+     * Draw lines over null values
+     */
+    public T spanGaps(boolean spanGaps) {
+        this.spanGaps = spanGaps;
+        return getThis();
+    }
+
+    /**
+     * Format numbers to local strings
+     */
+    public T numberFormatEnabled(boolean numberFormatEnabled) {
+        this.numberFormatEnabled = numberFormatEnabled;
         return getThis();
     }
 
@@ -174,6 +192,8 @@ public abstract class AbstractOptions<T> implements JsonBuilder, Serializable {
         JUtils.putNotNull(map, "elements", elements);
         JUtils.putNotNull(map, "pan", pan);
         JUtils.putNotNull(map, "zoom", zoom);
+        JUtils.putNotNull(map, "spanGaps", spanGaps);
+        JUtils.putNotNull(map, "numberFormatEnabled", numberFormatEnabled);
         return map;
     }
 
